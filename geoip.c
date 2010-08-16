@@ -188,16 +188,15 @@ VALUE rb_geoip_country_look_up(VALUE self, VALUE addr) {
 /* GeoIP::Country for IPv6 ****************************************************/
 
 /* GeoIP::CountryV6.new('/path/to/GeoIPv6.dat')
- * load_option is not required for this database because it is ignored.
  */
 static VALUE rb_geoip_country_v6_new(int argc, VALUE *argv, VALUE self)
 {
   return rb_geoip_database_new(mGeoIP_CountryV6, argc, argv, self);
 }
 
-/* Pass this function an IP address as a string, it will return a hash
+/* Pass this function an IPv6 address as a string, it will return a hash
  * containing all the information that the database knows about the IP
- *    db.look_up('24.24.24.24')
+ *    db.look_up('2001:470:0:76::2')
  *    => {:country_code=>"US",
  *        :country_code3=>"USA",
  *        :country_name=>"United States"}
