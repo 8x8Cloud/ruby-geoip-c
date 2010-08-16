@@ -12,6 +12,7 @@
 static VALUE mGeoIP;
 static VALUE mGeoIP_City;
 static VALUE mGeoIP_Country;
+static VALUE mGeoIP_CountryV6;
 static VALUE mGeoIP_Organization;
 static VALUE mGeoIP_ISP;
 static VALUE mGeoIP_NetSpeed;
@@ -184,6 +185,41 @@ VALUE rb_geoip_country_look_up(VALUE self, VALUE addr) {
   return hash;
 }
 
+/* GeoIP::Country for IPv6 ****************************************************/
+
+/* GeoIP::CountryV6.new('/path/to/GeoIPv6.dat')
+ * load_option is not required for this database because it is ignored.
+ */
+static VALUE rb_geoip_country_v6_new(int argc, VALUE *argv, VALUE self)
+{
+  return rb_geoip_database_new(mGeoIP_CountryV6, argc, argv, self);
+}
+
+/* Pass this function an IP address as a string, it will return a hash
+ * containing all the information that the database knows about the IP
+ *    db.look_up('24.24.24.24')
+ *    => {:country_code=>"US",
+ *        :country_code3=>"USA",
+ *        :country_name=>"United States"}
+ */
+VALUE rb_geoip_country_v6_look_up(VALUE self, VALUE addr) {
+  GeoIP *gi;
+  VALUE hash = Qnil;
+  int country_id;
+  
+  Check_Type(addr, T_STRING);
+  Data_Get_Struct(self, GeoIP, gi);
+  country_id = GeoIP_id_by_addr_v6(gi, STR2CSTR(addr));
+  if(country_id < 1) return Qnil;
+  
+  hash = rb_hash_new();
+  rb_hash_sset(hash, "country_code", rb_str_new2(GeoIP_country_code[country_id]));
+  rb_hash_sset(hash, "country_code3", rb_str_new2(GeoIP_country_code3[country_id]));
+  rb_hash_sset(hash, "country_name", rb_str_new2(GeoIP_country_name[country_id]));
+  
+  return hash;
+}
+
 /* GeoIP::Organization *******************************************************/
 
 /* GeoIP::Organization.new('/path/to/GeoIPOrg.dat', load_option)
@@ -332,6 +368,10 @@ void Init_geoip()
   mGeoIP_Country = rb_define_class_under(mGeoIP, "Country", rb_cObject);
   rb_define_singleton_method(mGeoIP_Country, "new",      rb_geoip_country_new,      -1);
   rb_define_method(          mGeoIP_Country, "look_up",  rb_geoip_country_look_up,  1);
+
+  mGeoIP_CountryV6 = rb_define_class_under(mGeoIP, "CountryV6", rb_cObject);
+  rb_define_singleton_method(mGeoIP_CountryV6, "new",      rb_geoip_country_v6_new,      -1);
+  rb_define_method(          mGeoIP_CountryV6, "look_up",  rb_geoip_country_v6_look_up,  1);
 
   mGeoIP_Organization = rb_define_class_under(mGeoIP, "Organization", rb_cObject);
   rb_define_singleton_method(mGeoIP_Organization, "new",     rb_geoip_org_new,     -1);
