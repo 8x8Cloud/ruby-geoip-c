@@ -61,6 +61,17 @@ Usage for Organization Search
 
 The name is the only data available for Organizations.
 
+Usage for Other Libraries
+-------------------------
+
+Also compatible with the Region (paid), Country (paid and free), and 
+Country IPv6 (free) databases.
+
+    GeoIP::Region.new()
+    GeoIP::Country.new()
+    GeoIP::CountryV6.new()
+
+
 Install
 -------
 
@@ -145,6 +156,7 @@ Many thanks to our contributors:
 License
 -------
 Copyright (C) 2007--2009 Ryah Dahl (ry@tinyclouds.org), Matt Todd (mtodd@highgroove.com)
+Copyright (C) 2010 Thomas Morgan
 
 This program is free software. It comes without any warranty, to
 the extent permitted by applicable law. You can redistribute it

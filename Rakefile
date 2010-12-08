@@ -22,14 +22,14 @@ end
 
 spec = Gem::Specification.new do |s|
   s.name              = 'geoip-c'
-  s.version           = "0.7.0.1"
+  s.version           = "0.7.0.2"
 
-  s.authors           = ['Ryah Dahl', 'Matt Todd', 'Charles Brian Quinn', 'Michael Sheakoski', 'Silvio Quadri']
-  s.email             = 'mtodd@highgroove.com'
+  s.authors           = ['Ryah Dahl', 'Matt Todd', 'Charles Brian Quinn', 'Michael Sheakoski', 'Silvio Quadri', 'Thomas Morgan']
+  s.email             = 'tm@iprog.com'
 
   s.summary           = "A Binding to the GeoIP C library"
-  s.description       = 'Generic GeoIP lookup tool. Based on the geoip_city RubyGem by Ryah Dahl'
-  s.homepage          = "http://github.com/mtodd/geoip"
+  s.description       = 'Generic GeoIP lookup tool. Based on the geoip_city RubyGem by Ryah Dahl and the geoip-c Gem by Matt Todd'
+  s.homepage          = "http://github.com/zarqman/geoip"
 
   s.files             = ["Rakefile", "extconf.rb", "test.rb", "geoip.c", "README.md"]
   s.test_files        = 'test.rb'
