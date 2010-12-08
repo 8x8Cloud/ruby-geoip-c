@@ -236,6 +236,7 @@ VALUE rb_geoip_country_look_up(VALUE self, VALUE addr) {
   rb_hash_sset(hash, "country_code", rb_str_new2(GeoIP_country_code[country_id]));
   rb_hash_sset(hash, "country_code3", rb_str_new2(GeoIP_country_code3[country_id]));
   rb_hash_sset(hash, "country_name", rb_str_new2(GeoIP_country_name[country_id]));
+  rb_hash_sset(hash, "continent", rb_str_new2(GeoIP_country_continent[country_id]));
   
   return hash;
 }
@@ -270,6 +271,7 @@ VALUE rb_geoip_country_v6_look_up(VALUE self, VALUE addr) {
   rb_hash_sset(hash, "country_code", rb_str_new2(GeoIP_country_code[country_id]));
   rb_hash_sset(hash, "country_code3", rb_str_new2(GeoIP_country_code3[country_id]));
   rb_hash_sset(hash, "country_name", rb_str_new2(GeoIP_country_name[country_id]));
+  rb_hash_sset(hash, "continent", rb_str_new2(GeoIP_country_continent[country_id]));
   
   return hash;
 }
