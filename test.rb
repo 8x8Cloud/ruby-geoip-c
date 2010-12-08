@@ -69,7 +69,7 @@ class GeoIPCityTest < Test::Unit::TestCase
   
   def setup
     ## Change me!
-    @dbfile = '/usr/local/GeoIP/share/GeoIP/GeoLiteCity.dat'
+    @dbfile = '/usr/local/share/GeoIP/GeoLiteCity.dat'
   end
 
   def test_construction_default
@@ -82,28 +82,28 @@ class GeoIPCityTest < Test::Unit::TestCase
     h = db.look_up('24.24.24.24')
     #debugger
     assert_kind_of Hash, h
-    assert_equal 'Jamaica', h[:city]
+    assert_equal 'Baldwinsville', h[:city]
     assert_equal 'United States', h[:country_name]
   end
 
   def test_construction_index
     db = GeoIP::City.new(@dbfile, :index)
-    assert_look_up(db, '24.24.24.24', :city, 'Jamaica')
+    assert_look_up(db, '24.24.24.24', :city, 'Baldwinsville')
   end
 
   def test_construction_filesystem
     db = GeoIP::City.new(@dbfile, :filesystem)
-    assert_look_up(db, '24.24.24.24', :city, 'Jamaica')
+    assert_look_up(db, '24.24.24.24', :city, 'Baldwinsville')
   end
 
   def test_construction_memory
     db = GeoIP::City.new(@dbfile, :memory)
-    assert_look_up(db, '24.24.24.24', :city, 'Jamaica')
+    assert_look_up(db, '24.24.24.24', :city, 'Baldwinsville')
   end
 
   def test_construction_filesystem_check
     db = GeoIP::City.new(@dbfile, :filesystem, true)
-    assert_look_up(db, '24.24.24.24', :city, 'Jamaica')
+    assert_look_up(db, '24.24.24.24', :city, 'Baldwinsville')
   end
 
   def test_bad_db_file
@@ -157,6 +157,41 @@ class GeoIPOrgTest < Test::Unit::TestCase
     assert_raises Errno::ENOENT do
       GeoIP::Organization.new('/blah')
     end
+  end
+
+end
+
+class GeoIPRegionTest < Test::Unit::TestCase
+  
+  def setup
+    ## Change me!
+    @dbfile = '/usr/local/share/GeoIP/GeoIPRegion.dat'
+  end
+
+  def test_construction_default
+    db = GeoIP::Region.new(@dbfile)
+    
+    assert_raises TypeError do 
+      db.look_up(nil) 
+    end
+    
+    h = db.look_up('24.24.24.24')
+    assert_kind_of Hash, h
+    assert_equal 'NY', h[:region]
+    assert_equal 'New York', h[:region_name]
+    assert_equal 'US', h[:country_code]
+  end
+
+  def test_bad_db_file
+    assert_raises Errno::ENOENT do
+      GeoIP::Region.new('/blah')
+    end
+  end
+
+  def test_bad_ip
+    db = GeoIP::Region.new(@dbfile)
+    h = db.look_up('224.24.24.24')
+    assert_equal nil, h
   end
 
 end

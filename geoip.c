@@ -11,6 +11,7 @@
 
 static VALUE mGeoIP;
 static VALUE mGeoIP_City;
+static VALUE mGeoIP_Region;
 static VALUE mGeoIP_Country;
 static VALUE mGeoIP_CountryV6;
 static VALUE mGeoIP_Organization;
@@ -146,6 +147,60 @@ VALUE rb_geoip_city_look_up(VALUE self, VALUE addr) {
   if(record = GeoIP_record_by_addr(gi, StringValuePtr(addr))) {
     hash =  rb_city_record_to_hash(record);
     GeoIPRecord_delete(record);
+  }
+  return hash;
+}
+
+/* GeoIP::Region ************************************************************/
+
+VALUE rb_region_record_to_hash(GeoIPRegion *record)
+{
+  VALUE hash = rb_hash_new();
+  int country_id;
+  const char * rn;
+
+  if(strlen(record->country_code)==0)
+    return Qnil;
+  rb_hash_sset(hash, "country_code", rb_str_new2(record->country_code));
+  country_id = GeoIP_id_by_code(record->country_code);
+  rb_hash_sset(hash, "country_code3", rb_str_new2(GeoIP_country_code3[country_id]));
+  rb_hash_sset(hash, "country_name", rb_str_new2(GeoIP_country_name[country_id]));
+  rb_hash_sset(hash, "continent", rb_str_new2(GeoIP_country_continent[country_id]));
+  if(record->region && strlen(record->region)>0) {
+    rb_hash_sset(hash, "region", rb_str_new2(record->region));
+    if(rn = GeoIP_region_name_by_code(record->country_code, record->region)) {
+      rb_hash_sset(hash, "region_name", rb_str_new2(rn));
+    }
+  }
+
+  return hash;
+}
+
+/* GeoIP::Region.new('/path/to/GeoIPRegion.dat')
+ * load_option is not required for this database because it is ignored.
+ */
+static VALUE rb_geoip_region_new(int argc, VALUE *argv, VALUE self)
+{
+  return rb_geoip_database_new(mGeoIP_Region, argc, argv, self);
+}
+
+/* Pass this function an IP address as a string, it will return a hash
+ * containing all the information that the database knows about the IP
+ *    db.look_up('24.24.24.24')
+ *    => {:country_code=>"US",
+ *        :region=>"NY",
+ *        :region_name=>"New York"}
+ */
+VALUE rb_geoip_region_look_up(VALUE self, VALUE addr) {
+  GeoIP *gi;
+  GeoIPRegion *record = NULL;
+  VALUE hash = Qnil;
+
+  Check_Type(addr, T_STRING);
+  Data_Get_Struct(self, GeoIP, gi);
+  if(record = GeoIP_region_by_addr(gi, StringValuePtr(addr))) {
+    hash =  rb_region_record_to_hash(record);
+    GeoIPRegion_delete(record);
   }
   return hash;
 }
@@ -363,6 +418,10 @@ void Init_geoip()
   mGeoIP_City = rb_define_class_under(mGeoIP, "City", rb_cObject);
   rb_define_singleton_method(mGeoIP_City, "new",      rb_geoip_city_new,      -1);
   rb_define_method(          mGeoIP_City, "look_up",  rb_geoip_city_look_up,  1);
+
+  mGeoIP_Region = rb_define_class_under(mGeoIP, "Region", rb_cObject);
+  rb_define_singleton_method(mGeoIP_Region, "new",      rb_geoip_region_new,      -1);
+  rb_define_method(          mGeoIP_Region, "look_up",  rb_geoip_region_look_up,  1);
 
   mGeoIP_Country = rb_define_class_under(mGeoIP, "Country", rb_cObject);
   rb_define_singleton_method(mGeoIP_Country, "new",      rb_geoip_country_new,      -1);
